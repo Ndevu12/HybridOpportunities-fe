@@ -4,6 +4,9 @@ import { JobType } from "../pages/Jobs/JobsPage";
 import { mockJobsData } from "../../DummyData/Jobs";
 
 const API_BASE_URL = (import.meta as any).env.VITE_REACT_APP_API_BASE_URL;
+if (!API_BASE_URL) {
+  throw new Error("API_BASE_URL is not defined. Please set it in your environment variables.");
+}
 
 export const useFetchJobs = (filterData?: { title?: string; location?: string; fulltime?: string }) => {
   const [loading, setLoading] = useState(true);

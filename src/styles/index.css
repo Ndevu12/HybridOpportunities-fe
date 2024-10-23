@@ -6,26 +6,173 @@
   font-family: 'Poppins', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  /* color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87); */
-  background-color: #f4f4f6;
+  background-color: theme('colors.bg-primary');
+  color: theme('colors.neutral-800');
   scroll-behavior: smooth;
-
   font-synthesis: none;
 }
 
+/* Improved scrollbar styling */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #ffffff;
+  background-color: theme('colors.neutral-100');
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #070f2b;
+  background: linear-gradient(to bottom, theme('colors.blue-400'), theme('colors.blue-600'));
   border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, theme('colors.blue-500'), theme('colors.blue-700'));
+}
+
+/* Custom component classes using the @layer directive */
+@layer components {
+  /* Button Styles */
+  .btn {
+    @apply px-4 py-2 font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-blue-to-purple text-white hover:shadow-hover;
+  }
+  
+  .btn-secondary {
+    @apply bg-gradient-red-to-orange text-white hover:shadow-red-hover;
+  }
+  
+  .btn-outline {
+    @apply border border-blue-500 text-blue-500 hover:bg-blue-50;
+  }
+
+  .btn-neutral {
+    @apply bg-neutral-200 text-neutral-700 hover:bg-neutral-300;
+  }
+  
+  /* Card Styles */
+  .card {
+    @apply bg-white rounded-xl shadow-card p-6 transition-all duration-200;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-lg hover:scale-[1.01] hover:border-blue-200;
+  }
+  
+  /* Input Fields */
+  .input-field {
+    @apply w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+  
+  .textarea-field {
+    @apply w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+  
+  .select-field {
+    @apply w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+  
+  /* Form Label */
+  .form-label {
+    @apply block text-sm font-medium text-neutral-700 mb-1;
+  }
+  
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-blue {
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .badge-red {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  .badge-green {
+    @apply bg-success-light text-success-dark;
+  }
+  
+  .badge-yellow {
+    @apply bg-warning-light text-warning-dark;
+  }
+  
+  /* Container styles */
+  .container-fluid {
+    @apply w-full px-4 mx-auto sm:px-6 lg:px-8;
+  }
+  
+  /* Section styles */
+  .section {
+    @apply py-12 md:py-16;
+  }
+  
+  /* Heading styles */
+  .heading-xl {
+    @apply text-3xl font-bold text-neutral-900 md:text-4xl;
+  }
+  
+  .heading-lg {
+    @apply text-2xl font-bold text-neutral-900 md:text-3xl;
+  }
+  
+  .heading-md {
+    @apply text-xl font-bold text-neutral-900 md:text-2xl;
+  }
+  
+  .heading-sm {
+    @apply text-lg font-bold text-neutral-900 md:text-xl;
+  }
+  
+  /* Paragraph styles */
+  .text-body-lg {
+    @apply text-lg text-neutral-700;
+  }
+  
+  .text-body {
+    @apply text-base text-neutral-700;
+  }
+  
+  .text-body-sm {
+    @apply text-sm text-neutral-700;
+  }
+  
+  .text-body-xs {
+    @apply text-xs text-neutral-700;
+  }
+}
+
+/* Utility class for visually hidden content (accessibility) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s infinite linear;
 }
