@@ -6,6 +6,7 @@ import JobForm from "../../components/Froms/JobForm";
 import { Job } from "../../lib/job";
 import { truncateText } from "../../utils/truncateText";
 import { jwtDecode } from "jwt-decode";
+import useJobsContext from "../../context/jobs/JobsContext";
 
 const API_BASE_URL = (import.meta as any).env.VITE_REACT_APP_API_BASE_URL;
 
@@ -19,8 +20,10 @@ export type ArrayKeys =
 
 const UserJobsPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
+  const { jobs, fetchJobs, fetchJobById, postJob, updateJobStatus } =
+    useJobsContext();
   const [activeTab, setActiveTab] = useState("postedJobs");
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [userPostedJobs, setUserPostedJobs] = useState<Job[]>([]);
   const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
   const [newJob, setNewJob] = useState<Job>({
     position: "",
@@ -50,30 +53,25 @@ const UserJobsPage: React.FC = () => {
       return;
     }
 
-    const fetchJobs = async () => {
+    // Use the fetchJobs from JobsContext instead of direct API call
+    fetchJobs();
+  }, [isLoggedIn, navigate, fetchJobs]);
+
+  // Filter jobs for the current user once jobs are loaded
+  useEffect(() => {
+    if (jobs.length > 0) {
       const token = localStorage.getItem("token");
       if (token) {
-        try {
-          const response = await fetch(`${API_BASE_URL}/jobs`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+        // Decode the token to get the userId
+        const decodedToken: any = jwtDecode(token);
+        const userId = decodedToken.userId;
 
-          if (response.ok) {
-            const data = await response.json();
-            setJobs(data.jobs);
-          } else {
-            toast.error("Failed to fetch jobs");
-          }
-        } catch (error) {
-          toast.error("Something went wrong, Try again!");
-        }
+        // Filter jobs posted by the current user
+        const userJobs = jobs.filter((job) => job.postedBy === userId);
+        setUserPostedJobs(userJobs);
       }
-    };
-
-    fetchJobs();
-  }, [isLoggedIn, navigate]);
+    }
+  }, [jobs]);
 
   const fetchAccountInfo = async () => {
     const token = localStorage.getItem("token");
@@ -108,35 +106,25 @@ const UserJobsPage: React.FC = () => {
 
   useEffect(() => {
     const fetchAppliedJobs = async () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const appliedJobsDetails: Job[] = [];
-          for (const jobId of appliedJobs.map((job) => job.jobId)) {
-            const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-
-            if (response.ok) {
-              const job = await response.json();
-              appliedJobsDetails.push(job.job);
-            } else {
-              toast.error("Failed to fetch applied jobs");
-            }
+      try {
+        const appliedJobsDetails: Job[] = [];
+        for (const jobId of appliedJobs.map((job) => job.jobId)) {
+          // Use fetchJobById from context instead of direct API call
+          const job = await fetchJobById(jobId);
+          if (job) {
+            appliedJobsDetails.push(job);
           }
-          setAppliedJobsDetails(appliedJobsDetails);
-        } catch (error) {
-          toast.error("Something went wrong, Try again!");
         }
+        setAppliedJobsDetails(appliedJobsDetails);
+      } catch (error) {
+        toast.error("Something went wrong, Try again!");
       }
     };
 
     if (appliedJobs.length > 0) {
       fetchAppliedJobs();
     }
-  }, [appliedJobs]);
+  }, [appliedJobs, fetchJobById]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -200,100 +188,80 @@ const UserJobsPage: React.FC = () => {
 
   const handlePostJob = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const jobData = {
+    try {
+      const jobData = {
+        company: {
+          name: newJob.company.name,
+          website: newJob.company.website,
+          logo: newJob.company.logo,
+          logoBackground: "#FFFFFF",
+        },
+        contract: newJob.contract,
+        position: newJob.position,
+        location: newJob.location,
+        description: newJob.description,
+        requirements: newJob.requirements,
+        qualifications: newJob.qualifications,
+        responsibilities: newJob.responsibilities,
+        skills: newJob.skills,
+        benefits: newJob.benefits,
+        role: newJob.role,
+        status: newJob.status,
+        appliedJobs: [],
+      };
+
+      // Use postJob from context instead of direct API call
+      const success = await postJob(jobData);
+
+      if (success) {
+        toast.success("Job posted successfully");
+        setNewJob({
+          position: "",
+          description: "",
           company: {
-            name: newJob.company.name,
-            website: newJob.company.website,
-            logo: newJob.company.logo,
-            logoBackground: "#FFFFFF",
+            name: "",
+            logo: "",
+            website: "",
+            logoBackground: "",
           },
-          contract: newJob.contract,
-          position: newJob.position,
-          location: newJob.location,
-          description: newJob.description,
-          requirements: newJob.requirements,
-          qualifications: newJob.qualifications,
-          responsibilities: newJob.responsibilities,
-          skills: newJob.skills,
-          benefits: newJob.benefits,
-          role: newJob.role,
-          status: newJob.status,
-          appliedJobs: [],
-        };
-
-        const response = await fetch(`${API_BASE_URL}/jobs`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(jobData),
+          contract: "",
+          location: "",
+          status: "open",
+          requirements: { content: "", items: [""] },
+          qualifications: { content: "", items: [""] },
+          responsibilities: { content: "", items: [""] },
+          skills: { content: "", items: [""] },
+          benefits: { content: "", items: [""] },
+          role: { content: "", items: [""] },
         });
-
-        if (response.ok) {
-          toast.success("Job posted successfully");
-          const postedJob = await response.json();
-          setJobs([...jobs, postedJob]);
-          setNewJob({
-            position: "",
-            description: "",
-            company: {
-              name: "",
-              logo: "",
-              website: "",
-              logoBackground: "",
-            },
-            contract: "",
-            location: "",
-            status: "open",
-            requirements: { content: "", items: [""] },
-            qualifications: { content: "", items: [""] },
-            responsibilities: { content: "", items: [""] },
-            skills: { content: "", items: [""] },
-            benefits: { content: "", items: [""] },
-            role: { content: "", items: [""] },
-          });
-        } else if (response.status === 400) {
-          console.log("sent data: ", jobData);
-          toast.error("Please enter valid inputs.");
-        } else {
-          toast.error("Failed to post job");
-        }
-      } catch (error) {
-        toast.error("Something went wrong, Try again!");
+        // Refresh jobs list
+        fetchJobs();
+      } else {
+        toast.error("Failed to post job");
       }
+    } catch (error) {
+      toast.error("Something went wrong, Try again!");
     }
   };
 
   const handleJobStatusChange = async (jobId: string, newStatus: string) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/status`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: newStatus }),
-        });
+    try {
+      // Use updateJobStatus from context instead of direct API call
+      const success = await updateJobStatus(jobId, newStatus);
 
-        if (response.ok) {
-          toast.success("Job status updated successfully");
-          setJobs(
-            jobs.map((job) =>
-              job._id === jobId ? { ...job, status: newStatus } : job
-            )
-          );
-        } else {
-          toast.error("Failed to update job status");
-        }
-      } catch (error) {
-        toast.error("Something went wrong, Try again!");
+      if (success) {
+        toast.success("Job status updated successfully");
+        // Update local state to reflect the change
+        setUserPostedJobs(
+          userPostedJobs.map((job) =>
+            job._id === jobId ? { ...job, status: newStatus } : job
+          )
+        );
+      } else {
+        toast.error("Failed to update job status");
       }
+    } catch (error) {
+      toast.error("Something went wrong, Try again!");
     }
   };
 
@@ -343,9 +311,9 @@ const UserJobsPage: React.FC = () => {
         {activeTab === "postedJobs" && (
           <div className="mt-5 mb-7 px-10 pt-5 border border-grey-700 rounded-lg mx-auto max-w-4xl">
             <h2 className="text-xl font-bold mb-4">Jobs Statistics</h2>
-            {jobs.length > 0 ? (
+            {userPostedJobs.length > 0 ? (
               <ul>
-                {jobs.map((job) => (
+                {userPostedJobs.map((job) => (
                   <li
                     key={defaultJobKey()}
                     className="mb-4 border p-4 rounded cursor-pointer"
@@ -430,7 +398,9 @@ const UserJobsPage: React.FC = () => {
                         src={job?.company?.logo}
                         alt={job?.company?.name}
                         className="w-16 h-16 mr-4"
-                        style={{ backgroundColor: job?.company?.logoBackground }}
+                        style={{
+                          backgroundColor: job?.company?.logoBackground,
+                        }}
                       />
                       <div>
                         <p>
@@ -461,7 +431,8 @@ const UserJobsPage: React.FC = () => {
                       <strong>Contract:</strong> {job?.contract}
                     </p>
                     <p>
-                      <strong>Description:</strong> { truncateText(job?.description, 150)}
+                      <strong>Description:</strong>{" "}
+                      {truncateText(job?.description, 150)}
                     </p>
                     <p>
                       <strong>Status:</strong> {job?.status}

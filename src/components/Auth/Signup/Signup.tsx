@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Button from "../../Buttons/Button";
+import Button from "../../../components/atoms/Button/Button";
 
 const API_BASE_URL = (import.meta as any).env.VITE_REACT_APP_API_BASE_URL;
 
@@ -39,7 +39,7 @@ const Signup: React.FC<Props> = ({ signInFormActive }) => {
 
       if (response.ok) {
         toast.success("Success! 🚀 Registration successful.");
-        localStorage.setItem('hasAccount', 'true');
+        localStorage.setItem("hasAccount", "true");
         setTimeout(() => {
           signInFormLink();
         }, 2000);
@@ -52,7 +52,7 @@ const Signup: React.FC<Props> = ({ signInFormActive }) => {
       }
     } catch (error) {
       // Check if users already exist in localStorage
-      const existingUsers = localStorage.getItem('signupData');
+      const existingUsers = localStorage.getItem("signupData");
       let users = existingUsers ? JSON.parse(existingUsers) : [];
 
       // Ensure users is an array
@@ -67,8 +67,10 @@ const Signup: React.FC<Props> = ({ signInFormActive }) => {
       } else {
         // Add the new user to the array and save it back to localStorage
         users.push(data);
-        localStorage.setItem('signupData', JSON.stringify(users));
-        toast.error("Server is not responding. Your data has been saved locally.");
+        localStorage.setItem("signupData", JSON.stringify(users));
+        toast.error(
+          "Server is not responding. Your data has been saved locally."
+        );
       }
     } finally {
       setLoading(false);
@@ -78,7 +80,10 @@ const Signup: React.FC<Props> = ({ signInFormActive }) => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <ToastContainer />
-      <form onSubmit={signupFormHandler} className="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <form
+        onSubmit={signupFormHandler}
+        className="bg-white p-8 rounded shadow-md w-full max-w-md"
+      >
         <h2 className="text-2xl font-bold mb-6 text-center">Signup</h2>
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-700">
@@ -135,12 +140,17 @@ const Signup: React.FC<Props> = ({ signInFormActive }) => {
         <div className="mb-4 text-center">
           <p className="text-gray-600">
             Already have an account?
-            <span className="text-blue-500 cursor-pointer ml-1" onClick={signInFormLink}>
+            <span
+              className="text-blue-500 cursor-pointer ml-1"
+              onClick={signInFormLink}
+            >
               Login
             </span>
           </p>
         </div>
-        <Button className="w-full" text="Sign Up" loading={loading} />
+        <Button className="w-full" isLoading={loading}>
+          Signup
+        </Button>
       </form>
     </div>
   );

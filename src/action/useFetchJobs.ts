@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { JobType } from "../pages/Jobs/JobsPage";
+import { Job } from "../lib/job";
 import { mockJobsData } from "../../DummyData/Jobs";
 
 const API_BASE_URL = (import.meta as any).env.VITE_REACT_APP_API_BASE_URL;
@@ -10,7 +10,7 @@ if (!API_BASE_URL) {
 
 export const useFetchJobs = (filterData?: { title?: string; location?: string; fulltime?: string }) => {
   const [loading, setLoading] = useState(true);
-  const [jobsData, setJobsData] = useState<JobType[]>([]);
+  const [jobsData, setJobsData] = useState<Job[]>([]);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -18,26 +18,15 @@ export const useFetchJobs = (filterData?: { title?: string; location?: string; f
         const response = await fetch(`${API_BASE_URL}/jobs`);
 
         if (response.ok) {
-          const jobs: JobType[] = (await response.json()).jobs.map((job: any, index: number) => ({
-            ...job,
-            id: job._id || `job-${index}`,
-          }));
+          const jobs: Job[] = (await response.json()).jobs;
           setJobsData(filterJobs(jobs, filterData));
         } else {
           toast.error("Failed to fetch jobs: App is populated with dummy data.");
-          const jobs = mockJobsData.map((job, index) => ({
-            ...job,
-            id: job.id || `job-${index}`,
-          }));
-          setJobsData(filterJobs(jobs, filterData));
+          setJobsData(filterJobs(mockJobsData, filterData));
         }
       } catch (error: any) {
         toast.error(`Error fetching jobs: ${error.message}`);
-        const jobs = mockJobsData.map((job, index) => ({
-          ...job,
-          id: job.id || `job-${index}`,
-        }));
-        setJobsData(filterJobs(jobs, filterData));
+        setJobsData(filterJobs(mockJobsData, filterData));
       } finally {
         setLoading(false);
       }
@@ -46,7 +35,7 @@ export const useFetchJobs = (filterData?: { title?: string; location?: string; f
     fetchJobs();
   }, [filterData]);
 
-  const filterJobs = (jobs: JobType[], filterData?: { title?: string; location?: string; fulltime?: string }) => {
+  const filterJobs = (jobs: Job[], filterData?: { title?: string; location?: string; fulltime?: string }) => {
     if (!filterData) return jobs;
 
     return jobs.filter(job => {
