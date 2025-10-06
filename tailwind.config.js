@@ -4,7 +4,7 @@ export default {
     theme: {
       extend: {
         colors: {
-          // Primary blue colors - gradient from light to dark
+          // Primary blue colors - for core actions (trust, confidence)
           'blue-50': '#E6F0FF',
           'blue-100': '#CCE0FF',
           'blue-200': '#99C2FF',
@@ -16,17 +16,41 @@ export default {
           'blue-800': '#002966',
           'blue-900': '#001433',
           
-          // Primary red colors - gradient from light to dark
-          'red-50': '#FFEBEB',
-          'red-100': '#FFD6D6',
-          'red-200': '#FFADAD',
-          'red-300': '#FF8585',
-          'red-400': '#FF5C5C',
-          'red-500': '#FF3333', // Base red
-          'red-600': '#CC2929',
-          'red-700': '#991F1F',
-          'red-800': '#661414',
-          'red-900': '#330A0A',
+          // Purple colors - for exploration/discovery actions
+          'purple-50': '#F3F0FF',
+          'purple-100': '#E9E5FF',
+          'purple-200': '#D4CCFF',
+          'purple-300': '#B8A3FF',
+          'purple-400': '#9B7AFF',
+          'purple-500': '#7C3AED', // Base purple
+          'purple-600': '#6D28D9',
+          'purple-700': '#5B21B6',
+          'purple-800': '#4C1D95',
+          'purple-900': '#3B0764',
+          
+          // Success green colors - for positive actions
+          'green-50': '#ECFDF5',
+          'green-100': '#D1FAE5',
+          'green-200': '#A7F3D0',
+          'green-300': '#6EE7B7',
+          'green-400': '#34D399',
+          'green-500': '#10B981', // Base green
+          'green-600': '#059669',
+          'green-700': '#047857',
+          'green-800': '#065F46',
+          'green-900': '#064E3B',
+          
+          // Danger red colors - for destructive actions only
+          'red-50': '#FEF2F2',
+          'red-100': '#FEE2E2',
+          'red-200': '#FECACA',
+          'red-300': '#FCA5A5',
+          'red-400': '#F87171',
+          'red-500': '#EF4444', // Base red
+          'red-600': '#DC2626',
+          'red-700': '#B91C1C',
+          'red-800': '#991B1B',
+          'red-900': '#7F1D1D',
           
           // Neutral colors
           'neutral-50': '#F9FAFB',
@@ -40,28 +64,17 @@ export default {
           'neutral-800': '#1F2937',
           'neutral-900': '#111827',
           
-          // Success, warning, error feedback colors
-          'success-light': '#ECFDF5',
-          'success': '#10B981',
-          'success-dark': '#047857',
-          
-          'warning-light': '#FFFBEB',
-          'warning': '#F59E0B',
-          'warning-dark': '#B45309',
-          
-          'error-light': '#FEF2F2',
-          'error': '#EF4444',
-          'error-dark': '#B91C1C',
+          // Semantic colors
+          'primary': '#0066FF', // Blue for primary actions
+          'secondary': '#7C3AED', // Purple for exploration
+          'success': '#10B981', // Green for positive actions
+          'danger': '#EF4444', // Red for destructive actions
+          'warning': '#F59E0B', // Amber for warnings
           
           // Background colors
           'bg-primary': '#FFFFFF',
           'bg-secondary': '#F9FAFB',
           'bg-tertiary': '#F3F4F6',
-          
-          // Keep a few of your original colors for compatibility
-          'primary': '#0066FF',
-          'secondary': '#FF3333',
-          'background': '#F9FAFB',
         },
         
         fontFamily: {
@@ -146,10 +159,13 @@ export default {
         
         // Adding gradients
         backgroundImage: {
-          'gradient-blue-to-purple': 'linear-gradient(135deg, #0066FF 0%, #6B46C1 100%)',
-          'gradient-red-to-orange': 'linear-gradient(135deg, #FF3333 0%, #FF9933 100%)',
+          'gradient-primary': 'linear-gradient(135deg, #0066FF 0%, #0052CC 100%)', // Blue gradient for primary actions
+          'gradient-secondary': 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)', // Purple gradient for exploration
+          'gradient-success': 'linear-gradient(135deg, #10B981 0%, #059669 100%)', // Green gradient for positive actions
+          'gradient-danger': 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)', // Red gradient for destructive actions
           'gradient-blue-light': 'linear-gradient(135deg, #E6F0FF 0%, #CCE0FF 100%)',
-          'gradient-red-light': 'linear-gradient(135deg, #FFEBEB 0%, #FFD6D6 100%)',
+          'gradient-purple-light': 'linear-gradient(135deg, #F3F0FF 0%, #E9E5FF 100%)',
+          'gradient-green-light': 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)',
           'gradient-neutral': 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)',
         },
       }

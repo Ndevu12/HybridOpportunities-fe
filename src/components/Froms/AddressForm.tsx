@@ -102,8 +102,8 @@ const AddressForm: React.FC<AddressFormProps> = ({ formData, handleInputChange, 
             className="mt-1 p-2 w-full border rounded bg-white"
           />
         </div>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Update Profile</button>
-        <button type="button" onClick={() => setEditMode(false)} className="ml-4 bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+        <button type="submit" className="bg-primary text-white px-4 py-2 rounded">Update Profile</button>
+        <button type="button" onClick={() => setEditMode(false)} className="ml-4 bg-neutral-500 text-white px-4 py-2 rounded">Cancel</button>
       </form>
     </div>
   );

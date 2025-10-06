@@ -42,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         >
           <Icon
             name="search"
-            color="textSecondary"
+            color="secondary"
             size={isLarge ? "md" : "sm"}
           />
         </div>
@@ -63,7 +63,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             type="submit"
             variant="primary"
             size={isLarge ? "lg" : "md"}
-            className={`rounded-full ${isLarge ? "px-8" : "px-5"}`}
+            className={`rounded-full m-3 ${isLarge ? "px-8" : "px-5"}`}
           >
             Search
           </Button>

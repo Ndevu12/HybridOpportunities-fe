@@ -68,13 +68,13 @@ const Navigation: React.FC = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <div className="bg-gradient-blue-to-purple text-white p-2 rounded-md mr-2">
+              <div className="bg-gradient-primary text-white p-2 rounded-md mr-2">
                 <Icon name="work" size="lg" color="white" />
               </div>
               <Typography
                 variant="h5"
                 weight="bold"
-                className="bg-gradient-to-r from-blue-500 to-red-500 bg-clip-text text-transparent"
+                className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
               >
                 RemoteJobs
               </Typography>

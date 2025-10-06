@@ -61,7 +61,7 @@ const ApplicantsPage: React.FC = () => {
         </ul>
       )}
       <button
-        className="mt-4 bg-blue-400 text-white px-4 py-2 rounded"
+        className="mt-4 bg-primary text-white px-4 py-2 rounded"
         onClick={() => navigate(-1)}
       >
         Back to Jobs

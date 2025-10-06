@@ -66,11 +66,11 @@ const ExperienceForm: React.FC<ExperienceFormProps> = ({
             className="mt-1 p-2 w-full border rounded"
             rows={4}
           />
-          <button type="button" onClick={() => handleRemoveExperience(index)} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">Remove</button>
+          <button type="button" onClick={() => handleRemoveExperience(index)} className="mt-4 bg-danger text-white px-4 py-2 rounded">Remove</button>
         </div>
       ))}
-      <button type="button" onClick={handleAddExperience} className="bg-blue-500 text-white px-4 py-2 rounded">Add Experience</button>
-      <button type="submit" className="ml-4 bg-green-500 text-white px-4 py-2 rounded">Update Experience</button>
+      <button type="button" onClick={handleAddExperience} className="bg-primary text-white px-4 py-2 rounded">Add Experience</button>
+      <button type="submit" className="ml-4 bg-success text-white px-4 py-2 rounded">Update Experience</button>
     </form>
   );
 };

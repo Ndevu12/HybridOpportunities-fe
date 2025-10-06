@@ -37,7 +37,7 @@ const FilterForm = (props: Props) => {
         />
       </div>
       <div className="flex items-center w-full">
-        <button type="submit" className="w-full bg-blue-400 text-white p-2 rounded-md flex items-center justify-center">
+        <button type="submit" className="w-full bg-primary text-white p-2 rounded-md flex items-center justify-center">
           <Search className="mr-2" />
           Search
         </button>

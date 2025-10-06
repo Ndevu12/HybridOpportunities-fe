@@ -387,8 +387,8 @@ const ProfilePage: React.FC = () => {
                 <p><span className='font-medium text-lg'>Occupation: </span>{userData?.occupation}</p>
                 <p><span className='font-medium text-lg'>Phone: </span>{userData?.phone}</p>
                 <p><span className='font-medium text-lg'>Address: </span>{`${userData?.address?.street || ''}, ${userData?.address?.city || ''}, ${userData?.address?.state || ''}, ${userData?.address?.zipCode || ''}, ${userData?.address?.country || ''}`}</p>
-                <button onClick={() => setEditMode(true)} className="w-[30%] bg-blue-400 text-white px-4 py-2 rounded mt-4">Edit Profile</button>
-                <button onClick={handleChangePassword} className="w-[30%] bg-red-400 text-white px-4 py-2 rounded mt-4">Change Password</button>
+                <button onClick={() => setEditMode(true)} className="w-[30%] bg-primary text-white px-4 py-2 rounded mt-4">Edit Profile</button>
+                <button onClick={handleChangePassword} className="w-[30%] bg-danger text-white px-4 py-2 rounded mt-4">Change Password</button>
               </div>
             )}
             <div className="mt-8 flex flex-col items-left justify-center pl-10 pt-10 pb-5 mb-4 border border-gray-100 rounded">
