@@ -438,7 +438,7 @@ const SingleJobPage: React.FC = () => {
           {/* Apply Now Footer */}
           <Card
             elevation="sm"
-            className="bg-gradient-blue-to-purple text-white"
+            className="bg-gradient-primary text-white"
           >
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-4 md:mb-0 text-center md:text-left">

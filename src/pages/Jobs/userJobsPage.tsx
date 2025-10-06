@@ -368,13 +368,13 @@ const UserJobsPage: React.FC = () => {
                           job.status === "open" ? "closed" : "open"
                         )
                       }
-                      className="bg-blue-400 text-white px-4 py-2 rounded mt-2"
+                      className="bg-primary text-white px-4 py-2 rounded mt-2"
                     >
                       {job.status === "open" ? "Close Job" : "Reopen Job"}
                     </button>
                     <button
                       onClick={() => handleViewApplicants(job._id!)}
-                      className="bg-green-400 text-white px-4 py-2 rounded mt-2 ml-2"
+                      className="bg-success text-white px-4 py-2 rounded mt-2 ml-2"
                     >
                       View Applicants
                     </button>

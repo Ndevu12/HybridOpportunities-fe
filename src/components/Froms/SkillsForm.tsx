@@ -48,11 +48,11 @@ const SkillsForm: React.FC<SkillsFormProps> = ({
             onChange={(e) => handleInputChange(e, index)}
             className="mt-1 p-2 w-full border rounded"
           />
-          <button type="button" onClick={() => handleRemoveSkill(index)} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">Remove</button>
+          <button type="button" onClick={() => handleRemoveSkill(index)} className="mt-4 bg-danger text-white px-4 py-2 rounded">Remove</button>
         </div>
       ))}
-      <button type="button" onClick={handleAddSkill} className="bg-blue-500 text-white px-4 py-2 rounded">Add Skill</button>
-      <button type="submit" className="ml-4 bg-green-500 text-white px-4 py-2 rounded">Update Skills</button>
+      <button type="button" onClick={handleAddSkill} className="bg-primary text-white px-4 py-2 rounded">Add Skill</button>
+      <button type="submit" className="ml-4 bg-success text-white px-4 py-2 rounded">Update Skills</button>
     </form>
   );
 };
