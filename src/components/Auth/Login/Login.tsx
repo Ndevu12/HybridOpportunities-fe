@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Button from "../../Buttons/Button";
+import Button from "../../../components/atoms/Button/Button";
 import { generateToken } from "../../../utils/tokenUtils";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -51,7 +51,7 @@ const Login: React.FC = () => {
         login(); // Update AuthContext state
         setHasAccount(true); // Ensure hasAccount is set to true
         setLoading(false);
-        navigate('/');
+        navigate("/");
       } else if (response.status === 401) {
         toast.error("Invalid Credentials.");
         setLoading(false);
@@ -62,7 +62,7 @@ const Login: React.FC = () => {
         throw new Error("Server error");
       }
     } catch (error) {
-      const existingUsers = localStorage.getItem('signupData');
+      const existingUsers = localStorage.getItem("signupData");
       let users = existingUsers ? JSON.parse(existingUsers) : [];
 
       // Ensure users is an array
@@ -70,14 +70,17 @@ const Login: React.FC = () => {
         users = [];
       }
 
-      const user = users.find((user: any) => user.email === formData.email && user.password === formData.password);
+      const user = users.find(
+        (user: any) =>
+          user.email === formData.email && user.password === formData.password
+      );
       if (user) {
         const token = generateToken({ email: user.email });
         localStorage.setItem("local_token", token);
         toast.success("Login successful using local data! Welcome!");
         login(); // Update AuthContext state
         setHasAccount(true); // Ensure hasAccount is set to true
-        navigate('/');
+        navigate("/");
       } else {
         toast.error("Invalid Credentials or Server is not responding.");
       }
@@ -86,13 +89,16 @@ const Login: React.FC = () => {
   };
 
   const handleSignUpClick = () => {
-    navigate('/auth?type=signup');
+    navigate("/auth?type=signup");
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <ToastContainer />
-      <form onSubmit={loginFormHandler} className="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <form
+        onSubmit={loginFormHandler}
+        className="bg-white p-8 rounded shadow-md w-full max-w-md"
+      >
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-700">
@@ -127,12 +133,17 @@ const Login: React.FC = () => {
         <div className="mb-4 text-center">
           <p className="text-gray-600">
             Don&apos;t have an account?
-            <span className="text-blue-500 cursor-pointer ml-1" onClick={handleSignUpClick}>
+            <span
+              className="text-blue-500 cursor-pointer ml-1"
+              onClick={handleSignUpClick}
+            >
               Sign up
             </span>
           </p>
         </div>
-        <Button className="w-full" text="Login" loading={loading} />
+        <Button className="w-full" isLoading={loading}>
+          Login
+        </Button>
       </form>
     </div>
   );

@@ -1,5 +1,15 @@
 .vscode/
 node_modules/
 dist/
+
+# Yarn
 yarn.lock
 .env
+
+# Yarn
+.yarn/
+.yarnrc.yml
+
+# PnP
+.pnp.loader.mjs
+.pnp.cjs

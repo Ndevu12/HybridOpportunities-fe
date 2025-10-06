@@ -1,6 +1,6 @@
 import React from 'react';
 import { toast } from 'react-toastify';
-import Button from '../Buttons/Button';
+import Button from '../atoms/Button/Button';
 
 interface ProfileImageUploadProps {
   profileImage: File | null;
@@ -57,9 +57,10 @@ const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({ profileImage, s
       <input type="file" name="profileImage" onChange={handleFileChange} className="w-[30%] mt-2 mb-2" />
       <Button
         className="text-white px-4 py-2 rounded mt-2"
-        text={'Change Profile Image'}
         onClick={handleUploadProfileImage}
-      />
+      >
+        Change Profile Image
+      </Button>
     </div>
   );
 };
