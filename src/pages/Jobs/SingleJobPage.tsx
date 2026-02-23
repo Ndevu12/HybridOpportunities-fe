@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,7 +12,7 @@ import Icon from "../../components/atoms/Icon/Icon";
 import Spinner from "../../components/atoms/Spinner/Spinner";
 import Card from "../../components/molecules/Card/Card";
 import Navigation from "../../components/organisms/Navigation/Navigation";
-import JobsContext from "../../context/jobs/JobsContext";
+import { useJobs } from "../../context/jobs/JobsContext";
 
 const API_BASE_URL = (import.meta as any).env.VITE_REACT_APP_API_BASE_URL;
 
@@ -26,8 +26,8 @@ const SingleJobPage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const navigate = useNavigate();
 
-  // Use JobsContext instead of direct API calls
-  const { getJobById, isLoading: contextLoading } = useContext(JobsContext);
+  // Use jobs hook to access context helpers
+  const { fetchJobById, loading: contextLoading } = useJobs();
 
   // Fetch job data using JobsContext
   useEffect(() => {
@@ -36,7 +36,7 @@ const SingleJobPage: React.FC = () => {
 
       try {
         setLoading(true);
-        const job = await getJobById(jobId);
+        const job = await fetchJobById(jobId);
         if (job) {
           setJobData(job);
         } else {
@@ -52,7 +52,7 @@ const SingleJobPage: React.FC = () => {
     };
 
     loadJob();
-  }, [jobId, getJobById]);
+  }, [jobId, fetchJobById]);
 
   // Company website handler
   const companyWebsiteHandler = () => {
@@ -78,7 +78,7 @@ const SingleJobPage: React.FC = () => {
           if (response.ok) {
             const account = (await response.json()).account;
             const hasApplied = jobData?.appliedJobs?.some(
-              (appliedJob: any) => appliedJob.userId === account._id
+              (appliedJob: any) => appliedJob.userId === account._id,
             );
             if (hasApplied) {
               setApplyText("Applied");
@@ -125,7 +125,7 @@ const SingleJobPage: React.FC = () => {
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (response.ok) {
@@ -136,14 +136,14 @@ const SingleJobPage: React.FC = () => {
         toast.error(
           errorData.message === "Your CV not found"
             ? errorData.message + ". Upload CV to apply."
-            : errorData.message
+            : errorData.message,
         );
       }
     } catch (error) {
       const local_token = localStorage.getItem("local_token");
       if (local_token) {
         const appliedJobs = JSON.parse(
-          localStorage.getItem("appliedJobs") || "[]"
+          localStorage.getItem("appliedJobs") || "[]",
         );
         appliedJobs.push({ jobId: jobData.id, method: "profileCV" });
         localStorage.setItem("appliedJobs", JSON.stringify(appliedJobs));
@@ -181,7 +181,7 @@ const SingleJobPage: React.FC = () => {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
-        }
+        },
       );
 
       if (response.ok) {
@@ -193,7 +193,7 @@ const SingleJobPage: React.FC = () => {
     } catch (error) {
       toast.error("Failed to apply for this job. Try again later.");
       const appliedJobs = JSON.parse(
-        localStorage.getItem("appliedJobs") || "[]"
+        localStorage.getItem("appliedJobs") || "[]",
       );
       appliedJobs.push({
         jobId: jobData._id || jobData.id,
@@ -387,7 +387,7 @@ const SingleJobPage: React.FC = () => {
                       <li key={`qual-${index}`} className="text-neutral-700">
                         {item}
                       </li>
-                    )
+                    ),
                   )}
                 </ul>
               </div>
@@ -408,7 +408,7 @@ const SingleJobPage: React.FC = () => {
                       <li key={`resp-${index}`} className="text-neutral-700">
                         {item}
                       </li>
-                    )
+                    ),
                   )}
                 </ul>
               </div>
@@ -427,7 +427,7 @@ const SingleJobPage: React.FC = () => {
                         <li key={`benefit-${index}`} className="text-blue-700">
                           {item}
                         </li>
-                      )
+                      ),
                     )}
                   </ul>
                 </div>
@@ -436,10 +436,7 @@ const SingleJobPage: React.FC = () => {
           </Card>
 
           {/* Apply Now Footer */}
-          <Card
-            elevation="sm"
-            className="bg-gradient-primary text-white"
-          >
+          <Card elevation="sm" className="bg-gradient-primary text-white">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-4 md:mb-0 text-center md:text-left">
                 <Typography

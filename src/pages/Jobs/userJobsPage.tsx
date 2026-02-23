@@ -6,7 +6,7 @@ import JobForm from "../../components/Froms/JobForm";
 import { Job } from "../../lib/job";
 import { truncateText } from "../../utils/truncateText";
 import { jwtDecode } from "jwt-decode";
-import useJobsContext from "../../context/jobs/JobsContext";
+import { useJobs } from "../../context/jobs/JobsContext";
 
 const API_BASE_URL = (import.meta as any).env.VITE_REACT_APP_API_BASE_URL;
 
@@ -20,8 +20,7 @@ export type ArrayKeys =
 
 const UserJobsPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
-  const { jobs, fetchJobs, fetchJobById, postJob, updateJobStatus } =
-    useJobsContext();
+  const { jobs, fetchJobs, fetchJobById, postJob, updateJobStatus } = useJobs();
   const [activeTab, setActiveTab] = useState("postedJobs");
   const [userPostedJobs, setUserPostedJobs] = useState<Job[]>([]);
   const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
@@ -127,7 +126,7 @@ const UserJobsPage: React.FC = () => {
   }, [appliedJobs, fetchJobById]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     const nameParts: string[] = name.split(".");
@@ -148,7 +147,7 @@ const UserJobsPage: React.FC = () => {
   const handleArrayInputChange = (
     arrayName: ArrayKeys,
     index: number,
-    value: string
+    value: string,
   ) => {
     setNewJob((prevState) => {
       const updatedArray = [...prevState[arrayName].items];
@@ -173,7 +172,7 @@ const UserJobsPage: React.FC = () => {
   const removeArrayItem = (arrayName: ArrayKeys, index: number) => {
     setNewJob((prevState) => {
       const updatedArray = prevState[arrayName].items.filter(
-        (_, i) => i !== index
+        (_, i) => i !== index,
       );
       return {
         ...prevState,
@@ -254,8 +253,8 @@ const UserJobsPage: React.FC = () => {
         // Update local state to reflect the change
         setUserPostedJobs(
           userPostedJobs.map((job) =>
-            job._id === jobId ? { ...job, status: newStatus } : job
-          )
+            job._id === jobId ? { ...job, status: newStatus } : job,
+          ),
         );
       } else {
         toast.error("Failed to update job status");
@@ -365,7 +364,7 @@ const UserJobsPage: React.FC = () => {
                       onClick={() =>
                         handleJobStatusChange(
                           job._id!,
-                          job.status === "open" ? "closed" : "open"
+                          job.status === "open" ? "closed" : "open",
                         )
                       }
                       className="bg-primary text-white px-4 py-2 rounded mt-2"

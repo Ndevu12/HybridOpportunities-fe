@@ -33,6 +33,8 @@ interface JobsContextType {
   currentFilters: JobFilters;
   hasAppliedFilters: boolean;
   refreshJobDetails: (jobId: string) => Promise<void>;
+  postJob: (jobData: Job) => Promise<boolean>;
+  updateJobStatus: (jobId: string, status: string) => Promise<boolean>;
 }
 
 // Create context with default values
@@ -49,6 +51,8 @@ const JobsContext = createContext<JobsContextType>({
   currentFilters: {},
   hasAppliedFilters: false,
   refreshJobDetails: async () => {},
+  postJob: async () => false,
+  updateJobStatus: async () => false,
 });
 
 // Custom hook to use the context
@@ -83,7 +87,7 @@ export const JobsProvider: React.FC<{ children: React.ReactNode }> = ({
       setError(null);
 
       try {
-        // Build query params
+        // Build query params for server side search/filters
         const queryParams = filters ? new URLSearchParams() : undefined;
         if (filters) {
           Object.entries(filters).forEach(([key, value]) => {
@@ -121,8 +125,17 @@ export const JobsProvider: React.FC<{ children: React.ReactNode }> = ({
         });
         setJobsCache(newCache);
         setJobs(jobsData);
-        // Use jobs directly for filtered jobs (no conversion needed)
-        setFilteredJobs(jobsData);
+
+        // if filters were provided, update currentFilters and filter locally as well
+        if (filters && Object.values(filters).some((v) => !!v)) {
+          setCurrentFilters(filters);
+          // map search to searchQuery like applyFilters
+          const mapped = { ...filters, searchQuery: filters.search } as any;
+          setFilteredJobs(filterJobs(jobsData, mapped));
+        } else {
+          setFilteredJobs(jobsData);
+        }
+
         setLastFetched(now);
 
         // Set featured jobs (randomly select 3)
@@ -135,7 +148,7 @@ export const JobsProvider: React.FC<{ children: React.ReactNode }> = ({
         setLoading(false);
       }
     },
-    [jobs.length, lastFetched, jobsCache]
+    [jobs.length, lastFetched, jobsCache],
   );
 
   // Fetch a single job by ID
@@ -167,7 +180,7 @@ export const JobsProvider: React.FC<{ children: React.ReactNode }> = ({
           } catch (err) {
             console.error(
               "API fetch failed for job details, trying dummy data",
-              err
+              err,
             );
           }
         }
@@ -193,7 +206,7 @@ export const JobsProvider: React.FC<{ children: React.ReactNode }> = ({
         setLoading(false);
       }
     },
-    [jobsCache]
+    [jobsCache],
   );
 
   // Refresh job details (force fetch from API)
@@ -234,6 +247,111 @@ export const JobsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
+  // Post a new job to the backend or dummy data
+  const postJob = useCallback(
+    async (jobData: Job): Promise<boolean> => {
+      try {
+        let newJob: Job;
+        if (API_BASE_URL) {
+          const response = await fetch(`${API_BASE_URL}/jobs`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(jobData),
+          });
+          if (!response.ok) throw new Error("Failed to post job");
+          const data = await response.json();
+          newJob = data.job;
+        } else {
+          // fallback dummy behavior
+          newJob = { ...jobData, _id: Math.random().toString(36).substr(2, 9) };
+        }
+
+        setJobs((prev) => [...prev, newJob]);
+        setJobsCache((prev) => {
+          const id = newJob._id || newJob.id;
+          if (id) return { ...prev, [id]: newJob };
+          return prev;
+        });
+
+        // reapply filters so the new job only shows if it matches
+        if (currentFilters && Object.values(currentFilters).some((v) => !!v)) {
+          const mapped = {
+            ...currentFilters,
+            searchQuery: currentFilters.search,
+          } as any;
+          setFilteredJobs((prev) => filterJobs([...prev, newJob], mapped));
+        } else {
+          setFilteredJobs((prev) => [...prev, newJob]);
+        }
+
+        return true;
+      } catch (err) {
+        console.error("Error posting job:", err);
+        return false;
+      }
+    },
+    [currentFilters],
+  );
+  // Update the status of an existing job
+  const updateJobStatus = useCallback(
+    async (jobId: string, status: string): Promise<boolean> => {
+      try {
+        let updatedJob: Job;
+
+        if (API_BASE_URL) {
+          const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status }),
+          });
+          if (!response.ok) throw new Error("Failed to update job status");
+          const data = await response.json();
+          updatedJob = data.job;
+        } else {
+          // update locally
+          updatedJob = { ...(jobsCache[jobId] || ({} as Job)), status };
+        }
+
+        setJobs((prev) =>
+          prev.map((job) => {
+            const id = job._id || job.id;
+            return id === jobId ? updatedJob : job;
+          }),
+        );
+
+        // reapply filters to make sure status change doesn't break list
+        if (currentFilters && Object.values(currentFilters).some((v) => !!v)) {
+          const mapped = {
+            ...currentFilters,
+            searchQuery: currentFilters.search,
+          } as any;
+          setFilteredJobs((prev) =>
+            prev
+              .map((job) => {
+                const id = job._id || job.id;
+                return id === jobId ? updatedJob : job;
+              })
+              .filter((job) => filterJobs([job], mapped).length > 0),
+          );
+        } else {
+          setFilteredJobs((prev) =>
+            prev.map((job) => {
+              const id = job._id || job.id;
+              return id === jobId ? updatedJob : job;
+            }),
+          );
+        }
+
+        setJobsCache((prev) => ({ ...prev, [jobId]: updatedJob }));
+        return true;
+      } catch (err) {
+        console.error("Error updating job status:", err);
+        return false;
+      }
+    },
+    [currentFilters, jobsCache],
+  );
+
   // Apply filters to jobs using our utility function
   const applyFilters = useCallback(
     (filters: JobFilters) => {
@@ -253,8 +371,22 @@ export const JobsProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setFilteredJobs(filtered);
     },
-    [jobs]
+    [jobs],
   );
+
+  // whenever the raw job list or current filters change we
+  // make sure the filtered list reflects the latest criteria
+  useEffect(() => {
+    if (currentFilters && Object.values(currentFilters).some((v) => !!v)) {
+      const mapped = {
+        ...currentFilters,
+        searchQuery: currentFilters.search,
+      } as any;
+      setFilteredJobs(filterJobs(jobs, mapped));
+    } else {
+      setFilteredJobs(jobs);
+    }
+  }, [jobs, currentFilters]);
 
   // Initial fetch on mount
   useEffect(() => {
@@ -277,6 +409,8 @@ export const JobsProvider: React.FC<{ children: React.ReactNode }> = ({
     currentFilters,
     hasAppliedFilters,
     refreshJobDetails,
+    postJob,
+    updateJobStatus,
   };
 
   return (

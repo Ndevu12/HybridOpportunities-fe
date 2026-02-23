@@ -4,7 +4,6 @@ import JobListingTemplate from "../../components/templates/JobListingTemplate/Jo
 import Navigation from "../../components/organisms/Navigation/Navigation";
 import { useJobs } from "../../context/jobs/JobsContext";
 import { JobFilters as JobFiltersType } from "../../utils/helpers";
-import Footer from "../../components/Footer/Footer";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const JobsPage: React.FC = () => {
@@ -12,7 +11,8 @@ const JobsPage: React.FC = () => {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
 
-  const { jobs, filteredJobs, loading, error, applyFilters } = useJobs();
+  const { jobs, filteredJobs, loading, error, applyFilters, fetchJobs } =
+    useJobs();
   const [searchTerm, setSearchTerm] = useState(queryParams.get("search") || "");
 
   // Extract initial filters from URL params
@@ -27,24 +27,21 @@ const JobsPage: React.FC = () => {
       remote: queryParams.get("remote") === "true" ? true : false,
     };
 
-    // Only apply filters if there are any active filters in the URL
-    const hasActiveFilters = Object.values(initialFilters).some(
-      (val) => val !== undefined && val !== false && val !== ""
-    );
-
-    if (hasActiveFilters) {
-      applyFilters(initialFilters);
-    }
+    // Always try to fetch jobs with the initial filters (empty filters will be ignored by caching)
+    fetchJobs(initialFilters);
+    // keep local searchTerm in sync with URL param
+    setSearchTerm(queryParams.get("search") || "");
   }, []);
 
   // Handle search submission
   const handleSearch = (term: string) => {
     setSearchTerm(term);
 
-    // Apply search filter
-    applyFilters({
-      search: term,
-    });
+    // optimistically filter client‑side for instant feedback
+    applyFilters({ search: term });
+
+    // also request the backend in case results differ
+    fetchJobs({ search: term });
 
     // Update URL to reflect the search
     const newParams = new URLSearchParams(location.search);
@@ -60,7 +57,7 @@ const JobsPage: React.FC = () => {
         pathname: location.pathname,
         search: newParams.toString() ? `?${newParams.toString()}` : "",
       },
-      { replace: true }
+      { replace: true },
     );
   };
 
@@ -73,6 +70,7 @@ const JobsPage: React.FC = () => {
     };
 
     applyFilters(combinedFilters);
+    fetchJobs(combinedFilters);
 
     // Update URL to reflect all filters
     const newParams = new URLSearchParams();
@@ -92,7 +90,7 @@ const JobsPage: React.FC = () => {
         pathname: location.pathname,
         search: newParams.toString() ? `?${newParams.toString()}` : "",
       },
-      { replace: true }
+      { replace: true },
     );
   };
 
@@ -106,7 +104,7 @@ const JobsPage: React.FC = () => {
       {
         pathname: location.pathname,
       },
-      { replace: true }
+      { replace: true },
     );
   };
 
