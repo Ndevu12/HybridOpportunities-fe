@@ -1,0 +1,27 @@
+{
+  "default_branch": "develop",
+  "branches": [
+    "develop",
+    "main",
+    "origin",
+    "security/auto-clean",
+    "security/auto-clean-develop",
+    "security/auto-clean-main"
+  ],
+  "parent": {
+    "develop": null,
+    "main": "develop",
+    "origin": "develop",
+    "security/auto-clean": "develop",
+    "security/auto-clean-develop": "security/auto-clean",
+    "security/auto-clean-main": "security/auto-clean"
+  },
+  "order": [
+    "develop",
+    "main",
+    "origin",
+    "security/auto-clean",
+    "security/auto-clean-develop",
+    "security/auto-clean-main"
+  ]
+}
